@@ -1,8 +1,8 @@
 from textnode import TextNode
-from htmlnode import HTMLNode
+from htmlnode import LeafNode
 
 def main():
-    testNode = HTMLNode("<a>", "Cool Link", "asdf", {"href": "google.com", "target": "_blank"})
-    print(testNode.props_to_html())
+    testNode = LeafNode(tag="a", value="Cool Link", props={"href": "google.com", "target": "_blank"})
+    print(testNode.to_html())
 
 main()
