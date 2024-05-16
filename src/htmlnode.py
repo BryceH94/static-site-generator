@@ -38,7 +38,7 @@ class LeafNode(HTMLNode):
             raise ValueError("value is required for a LeafNode")
         
 class ParentNode(HTMLNode):
-    def __init__(self, tag, children, props=None):
+    def __init__(self, tag=None, children=None, props=None):
         if tag is None:
             raise ValueError("tag is required for a ParentNode")
         if children is None:
