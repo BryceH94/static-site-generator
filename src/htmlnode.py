@@ -46,4 +46,8 @@ class ParentNode(HTMLNode):
         super().__init__(tag=tag, children=children, props=props)
 
     def to_html(self):
-        pass
+        current_text = f'<{self.tag}>' if self.props is None else f'<{self.tag} {self.props_to_html()}>'
+        for node in self.children:
+            current_text += node.to_html()
+        current_text += f'</{self.tag}>'
+        return current_text
