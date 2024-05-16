@@ -15,13 +15,12 @@ class HTMLNode:
         return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
     
 class LeafNode(HTMLNode):
-    def __init__(self, tag=None, **kwargs):
-        value = kwargs.pop('value', None)
+    def __init__(self, tag=None, value=None, children=None, props=None):
         if value is None:
             raise ValueError("value is required for a LeafNode")
         #TODO check if has props but no tag? Not sure if possible. Don't think so
-        props = kwargs.pop('props', None)
-        children = kwargs.pop('children', None)
+        if props is not None and props is None:
+            raise ValueError("Cannot have properties without a tag")
         if children is not None:
             raise ValueError("LeafNodes cannot have children")
         super().__init__(tag=tag, value=value, props=props)
