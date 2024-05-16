@@ -1,8 +1,23 @@
 from textnode import TextNode
 from htmlnode import LeafNode
+from htmlnode import ParentNode
 
 def main():
-    testNode = LeafNode(tag="a", value="Cool Link", props={"href": "google.com", "target": "_blank"})
-    print(testNode.to_html())
+
+    node = ParentNode(
+        "p",
+        [
+            LeafNode("b", "Bold text"),
+            LeafNode(None, "Normal text"),
+            ParentNode(tag="p", children=[
+                LeafNode(None, "I'm in a parent")
+            ]),
+            LeafNode("i", "italic text"),
+            LeafNode(None, "Normal text"),
+        ],
+    )
+
+    print(node.to_html())
+
 
 main()
