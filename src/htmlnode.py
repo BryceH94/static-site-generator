@@ -18,7 +18,6 @@ class LeafNode(HTMLNode):
     def __init__(self, tag=None, value=None, children=None, props=None):
         if value is None:
             raise ValueError("value is required for a LeafNode")
-        #TODO check if has props but no tag? Not sure if possible. Don't think so
         if props is not None and props is None:
             raise ValueError("Cannot have properties without a tag")
         if children is not None:
