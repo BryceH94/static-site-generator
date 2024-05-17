@@ -24,6 +24,11 @@ class LeafNode(HTMLNode):
             raise ValueError("LeafNodes cannot have children")
         super().__init__(tag=tag, value=value, props=props)
 
+    def __eq__(self, OtherLeafNode):
+        if self.tag == OtherLeafNode.tag and self.value == OtherLeafNode.value and self.props == OtherLeafNode.props:
+            return True
+        return False
+
     def to_html(self):
         if self.value:
             if self.tag:
