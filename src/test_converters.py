@@ -3,6 +3,7 @@ import unittest
 from textnode import TextNode
 from htmlnode import LeafNode
 from converters import text_node_to_html_node
+from converters import split_nodes_delimiter
 
 class TestTextNodeToHTMLNode(unittest.TestCase):
     def test_text_node(self):
@@ -45,3 +46,23 @@ class TestTextNodeToHTMLNode(unittest.TestCase):
 
     if __name__ == "__main__":
         unittest.main()
+
+class TestSplitNodesDelimiter(unittest.TestCase):
+    def test_code_node(self):
+        node = TextNode("This is text with a `code block` word", "text")
+        expected_result = [
+            TextNode("This is text with a ", "text"),
+            TextNode("code block", "code"),
+            TextNode(" word", "text"),
+        ]
+        self.assertEqual(split_nodes_delimiter([node], "`", "code"), expected_result)
+
+    #TODO test bold node
+    #TODO test italic node
+    #TODO test non-text node returns unedited
+    #TODO test node with no delimiter returns unedited
+    #TODO test node with no closing delimiter raises Exception
+
+    if __name__ == "__main__":
+        unittest.main()
+
