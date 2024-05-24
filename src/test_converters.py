@@ -48,6 +48,24 @@ class TestTextNodeToHTMLNode(unittest.TestCase):
         unittest.main()
 
 class TestSplitNodesDelimiter(unittest.TestCase):
+    def test_bold_node(self):
+        node = TextNode("This is text with a **bold** word", "text")
+        expected_result = [
+            TextNode("This is text with a ", "text"),
+            TextNode("bold", "bold"),
+            TextNode(" word", "text"),
+        ]
+        self.assertEqual(split_nodes_delimiter([node], "**", "bold"), expected_result)
+
+    def test_italic_node(self):
+        node = TextNode("This is text with an *italic* word", "text")
+        expected_result = [
+            TextNode("This is text with an ", "text"),
+            TextNode("italic", "italic"),
+            TextNode(" word", "text"),
+        ]
+        self.assertEqual(split_nodes_delimiter([node], "*", "italic"), expected_result)
+
     def test_code_node(self):
         node = TextNode("This is text with a `code block` word", "text")
         expected_result = [
@@ -57,11 +75,35 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         ]
         self.assertEqual(split_nodes_delimiter([node], "`", "code"), expected_result)
 
-    #TODO test bold node
-    #TODO test italic node
-    #TODO test non-text node returns unedited
-    #TODO test node with no delimiter returns unedited
-    #TODO test node with no closing delimiter raises Exception
+    def test_nontext_node_unedited(self):
+        node = TextNode("This is all bold and should remain unchanged.", "bold")
+        expected_result = [
+            TextNode("This is all bold and should remain unchanged.", "bold")
+        ]
+        self.assertEqual(split_nodes_delimiter([node], "*", "italic"), expected_result)
+
+    def test_no_delimiter_returns_unedited(self):
+        node = TextNode("I don't have any delimiters!", "text")
+        expected_result = [
+            TextNode("I don't have any delimiters!", "text")
+        ]
+        self.assertEqual(split_nodes_delimiter([node], "*", "italic"), expected_result)
+
+    def test_no_closing_delimiter(self):
+        node = TextNode("I didn't close my *delimiter", "text")
+        with self.assertRaises(Exception):
+            split_nodes_delimiter([node], "*", "italic")
+
+    def test_two_italic_node(self):
+        node = TextNode("This is text with an *italic* word and *another* one", "text")
+        expected_result = [
+            TextNode("This is text with an ", "text"),
+            TextNode("italic", "italic"),
+            TextNode(" word and ", "text"),
+            TextNode("another", "italic"),
+            TextNode(" one", "text")
+        ]
+        self.assertEqual(split_nodes_delimiter([node], "*", "italic"), expected_result)
 
     if __name__ == "__main__":
         unittest.main()

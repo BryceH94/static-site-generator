@@ -25,7 +25,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     #TODO FORFUN Add support for nested elements
     #TODO FORFUN Add support for improper markdown
     #TODO BONUS Retain double asterisks when single asterisk is delimiter
-
+    
     result_nodes = list()
     
     for node in old_nodes:
