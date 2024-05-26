@@ -18,6 +18,12 @@ class TestExtractMarkdownLinks(unittest.TestCase):
         expected_result = [("link", "https://www.example.com"), ("another", "https://www.example.com/another")]
         self.assertEqual(extract_markdown_links(text), expected_result)
 
+    def test_image_link_not_extracted(self):
+        text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
+        expected_result = []
+        self.assertEqual(extract_markdown_links(text), expected_result)
+
+
     if __name__ == "__main__":
         unittest.main()
 
