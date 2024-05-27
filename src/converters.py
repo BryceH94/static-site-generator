@@ -1,5 +1,7 @@
 from htmlnode import HTMLNode, LeafNode
 from textnode import TextNode
+from extractors import extract_markdown_images
+from extractors import extract_markdown_links
 
 def text_node_to_html_node(text_node):
     if text_node.text_type == "text":
@@ -47,3 +49,46 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             result_nodes.append(node) 
 
     return result_nodes
+
+def split_nodes_image(old_nodes):
+    result_nodes = list ()
+
+    for node in old_nodes:
+        if node.text_type == "text":
+            images = extract_markdown_images(node.text)
+            if images:
+                text_after = node.text
+                for img in images:
+                    text_before, text_after = text_after.split(f"![{img[0]}]({img[1]})", 1)
+                    result_nodes.append(TextNode(text_before,"text"))
+                    result_nodes.append(TextNode(img[0], "image", img[1])) 
+                if text_after:
+                    result_nodes.append(TextNode(text_after,"text"))
+            else:
+                result_nodes.append(node) 
+        else:
+            result_nodes.append(node) 
+
+    return result_nodes
+
+def split_nodes_link(old_nodes):
+    result_nodes = list ()
+
+    for node in old_nodes:
+        if node.text_type == "text":
+            links = extract_markdown_links(node.text)
+            if links:
+                text_after = node.text
+                for link in links:
+                    text_before, text_after = text_after.split(f"[{link[0]}]({link[1]})", 1)
+                    result_nodes.append(TextNode(text_before,"text"))
+                    result_nodes.append(TextNode(link[0], "link", link[1])) 
+                if text_after:
+                    result_nodes.append(TextNode(text_after,"text"))
+            else:
+                result_nodes.append(node) 
+        else:
+            result_nodes.append(node) 
+
+    return result_nodes
+

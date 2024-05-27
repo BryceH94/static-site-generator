@@ -4,6 +4,8 @@ from textnode import TextNode
 from htmlnode import LeafNode
 from converters import text_node_to_html_node
 from converters import split_nodes_delimiter
+from converters import split_nodes_image
+from converters import split_nodes_link
 
 class TestTextNodeToHTMLNode(unittest.TestCase):
     def test_text_node(self):
@@ -104,6 +106,97 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             TextNode(" one", "text")
         ]
         self.assertEqual(split_nodes_delimiter([node], "*", "italic"), expected_result)
+
+    if __name__ == "__main__":
+        unittest.main()
+
+class TestSplitNodesImage(unittest.TestCase):
+    def test_one_node_ending_with_image(self):
+        text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
+        node = TextNode(text, "text")
+        old_nodes = [node]
+        expected_result = [
+            TextNode("This is text with an ", "text"),
+            TextNode("image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and ", "text"),
+            TextNode("another", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png")
+        ]
+        self.assertEqual(split_nodes_image(old_nodes), expected_result)
+
+    def test_multiple_nodes(self):
+        text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png)"       
+        node = TextNode(text, "text")
+        text = " and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png) node!"
+        node2 = TextNode(text, "text")
+        text = "Also text without links!"
+        node3 = TextNode(text, "text")
+        old_nodes = [node, node2, node3]
+        expected_result = [
+            TextNode("This is text with an ", "text"),
+            TextNode("image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and ", "text"),
+            TextNode("another", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png"),
+            TextNode(" node!", "text"),
+            TextNode("Also text without links!", "text")
+        ]
+        self.assertEqual(split_nodes_image(old_nodes), expected_result)
+
+    def test_node_with_link(self):
+        text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and [a link](link.link)"
+        node = TextNode(text, "text")
+        old_nodes = [node]
+        expected_result = [
+            TextNode("This is text with an ", "text"),
+            TextNode("image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and [a link](link.link)", "text")
+        ]
+        self.assertEqual(split_nodes_image(old_nodes), expected_result)
+
+    if __name__ == "__main__":
+        unittest.main()
+
+class TestSplitNodesLink(unittest.TestCase):
+    #I was lazy with these cases since they're basically the same as image
+    def test_one_node_ending_with_link(self):
+        text = "This is text with an [image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and [another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
+        node = TextNode(text, "text")
+        old_nodes = [node]
+        expected_result = [
+            TextNode("This is text with an ", "text"),
+            TextNode("image", "link", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and ", "text"),
+            TextNode("another", "link", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png")
+        ]
+        self.assertEqual(split_nodes_link(old_nodes), expected_result)
+
+    def test_multiple_nodes(self):
+        text = "This is text with an [image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png)"       
+        node = TextNode(text, "text")
+        text = " and [another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png) node!"
+        node2 = TextNode(text, "text")
+        text = "Also text without links!"
+        node3 = TextNode(text, "text")
+        old_nodes = [node, node2, node3]
+        expected_result = [
+            TextNode("This is text with an ", "text"),
+            TextNode("image", "link", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and ", "text"),
+            TextNode("another", "link", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png"),
+            TextNode(" node!", "text"),
+            TextNode("Also text without links!", "text")
+        ]
+        self.assertEqual(split_nodes_link(old_nodes), expected_result)
+
+    def test_node_with_link(self):
+        text = "This is text with an [image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![a link](link.link)"
+        node = TextNode(text, "text")
+        old_nodes = [node]
+        expected_result = [
+            TextNode("This is text with an ", "text"),
+            TextNode("image", "link", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and ![a link](link.link)", "text")
+        ]
+        self.assertEqual(split_nodes_link(old_nodes), expected_result)
 
     if __name__ == "__main__":
         unittest.main()
