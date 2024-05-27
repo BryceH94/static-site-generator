@@ -7,6 +7,7 @@ from converters import split_nodes_delimiter
 from converters import split_nodes_image
 from converters import split_nodes_link
 from converters import text_to_textnodes
+from converters import markdown_to_blocks
 
 class TestTextNodeToHTMLNode(unittest.TestCase):
     def test_text_node(self):
@@ -245,3 +246,54 @@ class TestTextToTextNodes(unittest.TestCase):
 
     if __name__ == "__main__":
         unittest.main()
+
+class TestMarkdownToBlocks(unittest.TestCase):
+    def test_text_node(self):
+        #How to indent lines in multiline string visual only?
+        markdown = """This is **bolded** paragraph
+
+This is another paragraph with *italic* text and `code` here
+This is the same paragraph on a new line
+
+* This is a list
+* with items
+        """
+
+        expected_result = [
+            "This is **bolded** paragraph",
+            "This is another paragraph with *italic* text and `code` here\nThis is the same paragraph on a new line",
+            "* This is a list\n* with items"
+        ] 
+        self.assertEqual(markdown_to_blocks(markdown), expected_result)
+
+    def test_huge_extra_newlines(self):
+        markdown = """
+        
+
+        
+This is **bolded** paragraph
+
+This is another paragraph with *italic* text and `code` here
+This is the same paragraph on a new line
+
+
+
+
+
+
+* This is a list
+* with items
+
+
+"""
+
+        expected_result = [
+            "This is **bolded** paragraph",
+            "This is another paragraph with *italic* text and `code` here\nThis is the same paragraph on a new line",
+            "* This is a list\n* with items"
+        ] 
+        self.assertEqual(markdown_to_blocks(markdown), expected_result)
+
+    if __name__ == "__main__":
+        unittest.main()
+

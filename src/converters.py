@@ -93,9 +93,6 @@ def split_nodes_link(old_nodes):
     return result_nodes
 
 def text_to_textnodes(text):
-    # text
-    # bold, italic, code
-    # link, image
     starter_node = TextNode(text, "text")
     new_nodes = split_nodes_delimiter([starter_node], "**", "bold")
     new_nodes = split_nodes_delimiter(new_nodes, "*", "italic")
@@ -103,3 +100,6 @@ def text_to_textnodes(text):
     new_nodes = split_nodes_image(new_nodes)
     new_nodes = split_nodes_link(new_nodes)
     return new_nodes
+
+def markdown_to_blocks(markdown):
+    return list(filter(lambda text: len(text) > 0, map(lambda block: block.strip(),  markdown.split("\n\n"))))
