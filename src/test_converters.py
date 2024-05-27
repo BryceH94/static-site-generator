@@ -6,6 +6,7 @@ from converters import text_node_to_html_node
 from converters import split_nodes_delimiter
 from converters import split_nodes_image
 from converters import split_nodes_link
+from converters import text_to_textnodes
 
 class TestTextNodeToHTMLNode(unittest.TestCase):
     def test_text_node(self):
@@ -201,3 +202,46 @@ class TestSplitNodesLink(unittest.TestCase):
     if __name__ == "__main__":
         unittest.main()
 
+class TestTextToTextNodes(unittest.TestCase):
+    def test_text_with_all_types(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
+        expected_result = [
+            TextNode("This is ", "text"),
+            TextNode("text", "bold"),
+            TextNode(" with an ", "text"),
+            TextNode("italic", "italic"),
+            TextNode(" word and a ", "text"),
+            TextNode("code block", "code"),
+            TextNode(" and an ", "text"),
+            TextNode("image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and a ", "text"),
+            TextNode("link", "link", "https://boot.dev"),
+        ]
+
+        self.assertEqual(text_to_textnodes(text), expected_result)
+
+    def test_text_with_all_but_one_types(self):
+        text = "This is text with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
+        expected_result = [
+            TextNode("This is text with an ", "text"),
+            TextNode("italic", "italic"),
+            TextNode(" word and a ", "text"),
+            TextNode("code block", "code"),
+            TextNode(" and an ", "text"),
+            TextNode("image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and a ", "text"),
+            TextNode("link", "link", "https://boot.dev"),
+        ]
+
+        self.assertEqual(text_to_textnodes(text), expected_result)
+
+    def test_just_text(self):
+        text = "This is text"
+        expected_result = [
+            TextNode("This is text", "text")
+        ]
+
+        self.assertEqual(text_to_textnodes(text), expected_result)
+
+    if __name__ == "__main__":
+        unittest.main()
