@@ -3,6 +3,13 @@ from textnode import TextNode
 from extractors import extract_markdown_images
 from extractors import extract_markdown_links
 
+block_type_paragraph = "paragraph"
+block_type_heading = "heading"
+block_type_code = "code"
+block_type_quote = "quote"
+block_type_unordered_list = "unordered_list"
+block_type_ordered_list =  "ordered_list"
+
 def text_node_to_html_node(text_node):
     if text_node.text_type == "text":
         return LeafNode(None, text_node.text)
@@ -103,3 +110,30 @@ def text_to_textnodes(text):
 
 def markdown_to_blocks(markdown):
     return list(filter(lambda text: len(text) > 0, map(lambda block: block.strip(),  markdown.split("\n\n"))))
+
+def block_to_block_type(markdown_block):
+    lines = markdown_block.split("\n")
+    headings = tuple(['#' * i + ' ' for i in range(1,7)])
+
+    if markdown_block.startswith(headings):
+        if len(lines) == 1:
+            #Can a heading have text directly beneath (i.e. only one newline)?
+            return block_type_heading
+    if markdown_block.startswith('```') and markdown_block.endswith('```'):
+        return block_type_code
+    if markdown_block.startswith('>'):
+        if len(filter(lambda line: line.startswith('>'))) == len(lines):
+            return block_type_quote
+    if markdown_block.startswith(('* ', '- ')):
+        if len(filter(lambda line: line.startswith(('* ', '- ')))) == len(lines):
+            return block_type_unordered_list
+    if markdown_block[0].isdigit():
+        for i, line in enumerate(lines):
+            num, text = line.split('. ', maxsplit=1)
+            if num.isdigit() and int(num) == i + 1 and text is not None:
+                continue
+            else:
+                return block_type_paragraph
+        return block_type_ordered_list
+
+    return block_type_paragraph
