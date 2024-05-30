@@ -122,10 +122,10 @@ def block_to_block_type(markdown_block):
     if markdown_block.startswith('```') and markdown_block.endswith('```'):
         return block_type_code
     if markdown_block.startswith('>'):
-        if len(filter(lambda line: line.startswith('>'))) == len(lines):
+        if len(list(filter(lambda line: line.startswith(">"), lines))) == len(lines):
             return block_type_quote
     if markdown_block.startswith(('* ', '- ')):
-        if len(filter(lambda line: line.startswith(('* ', '- ')))) == len(lines):
+        if len(list(filter(lambda line: line.startswith(('* ', '- ')), lines))) == len(lines):
             return block_type_unordered_list
     if markdown_block[0].isdigit():
         for i, line in enumerate(lines):
