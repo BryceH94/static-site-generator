@@ -2,12 +2,21 @@ import unittest
 
 from textnode import TextNode
 from htmlnode import LeafNode
-from converters import text_node_to_html_node
-from converters import split_nodes_delimiter
-from converters import split_nodes_image
-from converters import split_nodes_link
-from converters import text_to_textnodes
-from converters import markdown_to_blocks
+from converters import (
+    text_node_to_html_node
+    ,split_nodes_delimiter
+    ,split_nodes_image
+    ,split_nodes_link
+    ,text_to_textnodes
+    ,markdown_to_blocks
+    ,block_to_block_type
+    ,block_type_paragraph
+    ,block_type_heading
+    ,block_type_code
+    ,block_type_quote
+    ,block_type_unordered_list
+    ,block_type_ordered_list
+)
 
 class TestTextNodeToHTMLNode(unittest.TestCase):
     def test_text_node(self):
@@ -293,6 +302,109 @@ This is the same paragraph on a new line
             "* This is a list\n* with items"
         ] 
         self.assertEqual(markdown_to_blocks(markdown), expected_result)
+
+    if __name__ == "__main__":
+        unittest.main()
+
+class TestBlockToBlockType(unittest.TestCase):
+    def test_heading(self):
+        text = "## Heading"
+        expected_result = block_type_heading
+        self.assertEqual(block_to_block_type(text), expected_result)
+
+    def test_not_heading(self):
+        text = "##Not Heading"
+        expected_result = block_type_paragraph
+        self.assertEqual(block_to_block_type(text), expected_result)
+
+    def test_too_many_to_be_heading(self):
+        text = "####### Too Long for Heading"
+        expected_result = block_type_paragraph
+        self.assertEqual(block_to_block_type(text), expected_result)
+
+    def test_code(self):
+        text = "```I am some cool code yeah```"
+        expected_result = block_type_code
+        self.assertEqual(block_to_block_type(text), expected_result)
+
+    def test_not_code_no_closing(self):
+        text = "```I am some cool code but I forgot to close myself oops"
+        expected_result = block_type_paragraph
+        self.assertEqual(block_to_block_type(text), expected_result)
+
+    def test_not_code_not_triple(self):
+        text = "`I am some cool code but I forgot to use three`"
+        expected_result = block_type_paragraph
+        self.assertEqual(block_to_block_type(text), expected_result)
+
+    def test_quote(self):
+        line1 = ">I am an elegant quote"
+        line2 = ">I still am an elegant quote"
+        text = "\n".join([line1, line2])
+        expected_result = block_type_quote
+        self.assertEqual(block_to_block_type(text), expected_result)
+    
+    def test_quote_missing_sign(self):
+        line1 = ">I am an elegant quote"
+        line2 = "I am not an elegant quote"
+        text = "\n".join([line1, line2])
+        expected_result = block_type_paragraph
+        self.assertEqual(block_to_block_type(text), expected_result)
+
+    def test_unordered_list(self):
+        line1 = "* I am a list"
+        line2 = "- I still am a list"
+        text = "\n".join([line1, line2])
+        expected_result = block_type_unordered_list
+        self.assertEqual(block_to_block_type(text), expected_result)
+    
+    def test_ulist_missing_space(self):
+        line1 = "* I am a list"
+        line2 = "-I am not a list"
+        text = "\n".join([line1, line2])
+        expected_result = block_type_paragraph
+        self.assertEqual(block_to_block_type(text), expected_result)
+
+    def test_ulist_missing_sign(self):
+        line1 = "* I am a list"
+        line2 = "I am not a list"
+        text = "\n".join([line1, line2])
+        expected_result = block_type_paragraph
+        self.assertEqual(block_to_block_type(text), expected_result)
+    
+    def test_olist(self):
+        line1 = "1. I am a list"
+        line2 = "2. I am also a list"
+        text = "\n".join([line1, line2])
+        expected_result = block_type_ordered_list
+        self.assertEqual(block_to_block_type(text), expected_result)
+
+    def test_long_olist(self):
+        lines = [str(i) + ". List Item" for i in range(1,11)]
+        text = "\n".join(lines)
+        expected_result = block_type_ordered_list
+        self.assertEqual(block_to_block_type(text), expected_result)
+    
+    def test_olist_missing_period(self):
+        line1 = "1. I am a list"
+        line2 = "2 I am a bad list"
+        text = "\n".join([line1, line2])
+        expected_result = block_type_paragraph
+        self.assertEqual(block_to_block_type(text), expected_result)
+
+    def test_olist_missing_num(self):
+        line1 = "1. I am a list"
+        line2 = " I am a bad list"
+        text = "\n".join([line1, line2])
+        expected_result = block_type_paragraph
+        self.assertEqual(block_to_block_type(text), expected_result)
+
+    def test_olist_wrong_num(self):
+        line1 = "1. I am a list"
+        line2 = "3. I am a bad list"
+        text = "\n".join([line1, line2])
+        expected_result = block_type_paragraph
+        self.assertEqual(block_to_block_type(text), expected_result)
 
     if __name__ == "__main__":
         unittest.main()
