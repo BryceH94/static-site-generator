@@ -129,7 +129,10 @@ def block_to_block_type(markdown_block):
             return block_type_unordered_list
     if markdown_block[0].isdigit():
         for i, line in enumerate(lines):
-            num, text = line.split('. ', maxsplit=1)
+            if '. ' in line:
+                num, text = line.split('. ', maxsplit=1)
+            else:
+                return block_type_paragraph
             if num.isdigit() and int(num) == i + 1 and text is not None:
                 continue
             else:
