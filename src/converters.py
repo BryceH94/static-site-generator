@@ -1,27 +1,35 @@
 from htmlnode import HTMLNode, LeafNode, ParentNode
-from textnode import TextNode
+from textnode import (
+    TextNode
+    ,text_type_text
+    ,text_type_bold
+    ,text_type_code
+    ,text_type_image
+    ,text_type_italic
+    ,text_type_link
+)
 from extractors import extract_markdown_images
 from extractors import extract_markdown_links
 
 block_type_paragraph = "paragraph"
 block_type_heading = "heading"
-block_type_code = "code"
+block_type_code = text_type_code
 block_type_quote = "quote"
 block_type_unordered_list = "unordered_list"
 block_type_ordered_list =  "ordered_list"
 
 def text_node_to_html_node(text_node):
-    if text_node.text_type == "text":
+    if text_node.text_type == text_type_text:
         return LeafNode(None, text_node.text)
-    if text_node.text_type == "bold":
+    if text_node.text_type == text_type_bold:
         return LeafNode("b", text_node.text)
-    if text_node.text_type == "italic":
+    if text_node.text_type == text_type_italic:
         return LeafNode("i", text_node.text)
-    if text_node.text_type == "code":
-        return LeafNode("code", text_node.text)
-    if text_node.text_type == "link":
+    if text_node.text_type == text_type_code:
+        return LeafNode(text_type_code, text_node.text)
+    if text_node.text_type == text_type_link:
         return LeafNode("a", text_node.text, props={"href": text_node.url})
-    if text_node.text_type == "image":
+    if text_node.text_type == text_type_image:
         return LeafNode("img", "", props={"src": text_node.url, "alt": text_node.text})
 
     raise ValueError("invalid text type provided")
@@ -38,13 +46,13 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     result_nodes = list()
     
     for node in old_nodes:
-        if node.text_type == "text":
+        if node.text_type == text_type_text:
             if delimiter in node.text:
                 split_parts = node.text.split(delimiter)
 
                 for i, part in enumerate(split_parts):
                     if i % 2 == 0:
-                        result_nodes.append(TextNode(part, "text"))
+                        result_nodes.append(TextNode(part, text_type_text))
                     else:
                         if i == len(split_parts) - 1:
                             raise Exception("No closing delimiter found.")
@@ -61,16 +69,16 @@ def split_nodes_image(old_nodes):
     result_nodes = list ()
 
     for node in old_nodes:
-        if node.text_type == "text":
+        if node.text_type == text_type_text:
             images = extract_markdown_images(node.text)
             if images:
                 text_after = node.text
                 for img in images:
                     text_before, text_after = text_after.split(f"![{img[0]}]({img[1]})", 1)
-                    result_nodes.append(TextNode(text_before,"text"))
-                    result_nodes.append(TextNode(img[0], "image", img[1])) 
+                    result_nodes.append(TextNode(text_before,text_type_text))
+                    result_nodes.append(TextNode(img[0], text_type_image, img[1])) 
                 if text_after:
-                    result_nodes.append(TextNode(text_after,"text"))
+                    result_nodes.append(TextNode(text_after,text_type_text))
             else:
                 result_nodes.append(node) 
         else:
@@ -82,16 +90,16 @@ def split_nodes_link(old_nodes):
     result_nodes = list ()
 
     for node in old_nodes:
-        if node.text_type == "text":
+        if node.text_type == text_type_text:
             links = extract_markdown_links(node.text)
             if links:
                 text_after = node.text
                 for link in links:
                     text_before, text_after = text_after.split(f"[{link[0]}]({link[1]})", 1)
-                    result_nodes.append(TextNode(text_before,"text"))
-                    result_nodes.append(TextNode(link[0], "link", link[1])) 
+                    result_nodes.append(TextNode(text_before,text_type_text))
+                    result_nodes.append(TextNode(link[0], text_type_link, link[1])) 
                 if text_after:
-                    result_nodes.append(TextNode(text_after,"text"))
+                    result_nodes.append(TextNode(text_after,text_type_text))
             else:
                 result_nodes.append(node) 
         else:
@@ -100,10 +108,10 @@ def split_nodes_link(old_nodes):
     return result_nodes
 
 def text_to_textnodes(text):
-    starter_node = TextNode(text, "text")
-    new_nodes = split_nodes_delimiter([starter_node], "**", "bold")
-    new_nodes = split_nodes_delimiter(new_nodes, "*", "italic")
-    new_nodes = split_nodes_delimiter(new_nodes, "`", "code")
+    starter_node = TextNode(text, text_type_text)
+    new_nodes = split_nodes_delimiter([starter_node], "**", text_type_bold)
+    new_nodes = split_nodes_delimiter(new_nodes, "*", text_type_italic)
+    new_nodes = split_nodes_delimiter(new_nodes, "`", text_type_code)
     new_nodes = split_nodes_image(new_nodes)
     new_nodes = split_nodes_link(new_nodes)
     return new_nodes
@@ -145,3 +153,7 @@ def convert_paragraph_block_to_html(markdown_block):
     text_nodes = text_to_textnodes(markdown_block)
     html_nodes = list(map(lambda node: text_node_to_html_node(node), text_nodes))
     return ParentNode("p", children=html_nodes)
+
+#TODO Add in textnode types? So I don't forget what tags to use for textNode and HTMLNode
+def convert_code_block_to_html(markdown_block):
+    pass

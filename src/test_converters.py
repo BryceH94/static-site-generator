@@ -1,6 +1,14 @@
 import unittest
 
-from textnode import TextNode
+from textnode import (
+    TextNode
+    ,text_type_text
+    ,text_type_bold
+    ,text_type_code
+    ,text_type_image
+    ,text_type_italic
+    ,text_type_link
+)
 from htmlnode import LeafNode, HTMLNode, ParentNode
 from converters import (
     text_node_to_html_node
@@ -21,32 +29,32 @@ from converters import (
 
 class TestTextNodeToHTMLNode(unittest.TestCase):
     def test_text_node(self):
-        node = TextNode("Content", "text")
+        node = TextNode("Content", text_type_text)
         expected_result = LeafNode(None, "Content")
         self.assertEqual(text_node_to_html_node(node), expected_result)
 
     def test_bold_node(self):
-        node = TextNode("Content", "bold")
+        node = TextNode("Content", text_type_bold)
         expected_result = LeafNode("b", "Content")
         self.assertEqual(text_node_to_html_node(node), expected_result)
 
     def test_italic_node(self):
-        node = TextNode("Content", "italic")
+        node = TextNode("Content", text_type_italic)
         expected_result = LeafNode("i", "Content")
         self.assertEqual(text_node_to_html_node(node), expected_result)
 
     def test_code_node(self):
-        node = TextNode("Content", "code")
-        expected_result = LeafNode("code", "Content")
+        node = TextNode("Content", text_type_code)
+        expected_result = LeafNode(text_type_code, "Content")
         self.assertEqual(text_node_to_html_node(node), expected_result)
 
     def test_link_node(self):
-        node = TextNode("Content", "link", "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        node = TextNode("Content", text_type_link, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         expected_result = LeafNode("a", "Content", props={"href": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"})
         self.assertEqual(text_node_to_html_node(node), expected_result)
 
     def test_img_node(self):
-        node = TextNode("Content", "image", "https://www.pngfind.com/pngs/m/7-71783_pepe-the-frog-smirk-pepe-hd-png-download.png")
+        node = TextNode("Content", text_type_image, "https://www.pngfind.com/pngs/m/7-71783_pepe-the-frog-smirk-pepe-hd-png-download.png")
         expected_result = LeafNode("img", "", props=
             {"src": "https://www.pngfind.com/pngs/m/7-71783_pepe-the-frog-smirk-pepe-hd-png-download.png", 
              "alt": "Content"}
@@ -63,61 +71,61 @@ class TestTextNodeToHTMLNode(unittest.TestCase):
 
 class TestSplitNodesDelimiter(unittest.TestCase):
     def test_bold_node(self):
-        node = TextNode("This is text with a **bold** word", "text")
+        node = TextNode("This is text with a **bold** word", text_type_text)
         expected_result = [
-            TextNode("This is text with a ", "text"),
-            TextNode("bold", "bold"),
-            TextNode(" word", "text"),
+            TextNode("This is text with a ", text_type_text),
+            TextNode(text_type_bold, text_type_bold),
+            TextNode(" word", text_type_text),
         ]
-        self.assertEqual(split_nodes_delimiter([node], "**", "bold"), expected_result)
+        self.assertEqual(split_nodes_delimiter([node], "**", text_type_bold), expected_result)
 
     def test_italic_node(self):
-        node = TextNode("This is text with an *italic* word", "text")
+        node = TextNode("This is text with an *italic* word", text_type_text)
         expected_result = [
-            TextNode("This is text with an ", "text"),
-            TextNode("italic", "italic"),
-            TextNode(" word", "text"),
+            TextNode("This is text with an ", text_type_text),
+            TextNode(text_type_italic, text_type_italic),
+            TextNode(" word", text_type_text),
         ]
-        self.assertEqual(split_nodes_delimiter([node], "*", "italic"), expected_result)
+        self.assertEqual(split_nodes_delimiter([node], "*", text_type_italic), expected_result)
 
     def test_code_node(self):
-        node = TextNode("This is text with a `code block` word", "text")
+        node = TextNode("This is text with a `code block` word", text_type_text)
         expected_result = [
-            TextNode("This is text with a ", "text"),
-            TextNode("code block", "code"),
-            TextNode(" word", "text"),
+            TextNode("This is text with a ", text_type_text),
+            TextNode("code block", text_type_code),
+            TextNode(" word", text_type_text),
         ]
-        self.assertEqual(split_nodes_delimiter([node], "`", "code"), expected_result)
+        self.assertEqual(split_nodes_delimiter([node], "`", text_type_code), expected_result)
 
     def test_nontext_node_unedited(self):
-        node = TextNode("This is all bold and should remain unchanged.", "bold")
+        node = TextNode("This is all bold and should remain unchanged.", text_type_bold)
         expected_result = [
-            TextNode("This is all bold and should remain unchanged.", "bold")
+            TextNode("This is all bold and should remain unchanged.", text_type_bold)
         ]
-        self.assertEqual(split_nodes_delimiter([node], "*", "italic"), expected_result)
+        self.assertEqual(split_nodes_delimiter([node], "*", text_type_italic), expected_result)
 
     def test_no_delimiter_returns_unedited(self):
-        node = TextNode("I don't have any delimiters!", "text")
+        node = TextNode("I don't have any delimiters!", text_type_text)
         expected_result = [
-            TextNode("I don't have any delimiters!", "text")
+            TextNode("I don't have any delimiters!", text_type_text)
         ]
-        self.assertEqual(split_nodes_delimiter([node], "*", "italic"), expected_result)
+        self.assertEqual(split_nodes_delimiter([node], "*", text_type_italic), expected_result)
 
     def test_no_closing_delimiter(self):
-        node = TextNode("I didn't close my *delimiter", "text")
+        node = TextNode("I didn't close my *delimiter", text_type_text)
         with self.assertRaises(Exception):
-            split_nodes_delimiter([node], "*", "italic")
+            split_nodes_delimiter([node], "*", text_type_italic)
 
     def test_two_italic_node(self):
-        node = TextNode("This is text with an *italic* word and *another* one", "text")
+        node = TextNode("This is text with an *italic* word and *another* one", text_type_text)
         expected_result = [
-            TextNode("This is text with an ", "text"),
-            TextNode("italic", "italic"),
-            TextNode(" word and ", "text"),
-            TextNode("another", "italic"),
-            TextNode(" one", "text")
+            TextNode("This is text with an ", text_type_text),
+            TextNode(text_type_italic, text_type_italic),
+            TextNode(" word and ", text_type_text),
+            TextNode("another", text_type_italic),
+            TextNode(" one", text_type_text)
         ]
-        self.assertEqual(split_nodes_delimiter([node], "*", "italic"), expected_result)
+        self.assertEqual(split_nodes_delimiter([node], "*", text_type_italic), expected_result)
 
     if __name__ == "__main__":
         unittest.main()
@@ -125,42 +133,42 @@ class TestSplitNodesDelimiter(unittest.TestCase):
 class TestSplitNodesImage(unittest.TestCase):
     def test_one_node_ending_with_image(self):
         text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
-        node = TextNode(text, "text")
+        node = TextNode(text, text_type_text)
         old_nodes = [node]
         expected_result = [
-            TextNode("This is text with an ", "text"),
-            TextNode("image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
-            TextNode(" and ", "text"),
-            TextNode("another", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png")
+            TextNode("This is text with an ", text_type_text),
+            TextNode(text_type_image, text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and ", text_type_text),
+            TextNode("another", text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png")
         ]
         self.assertEqual(split_nodes_image(old_nodes), expected_result)
 
     def test_multiple_nodes(self):
         text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png)"       
-        node = TextNode(text, "text")
+        node = TextNode(text, text_type_text)
         text = " and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png) node!"
-        node2 = TextNode(text, "text")
+        node2 = TextNode(text, text_type_text)
         text = "Also text without links!"
-        node3 = TextNode(text, "text")
+        node3 = TextNode(text, text_type_text)
         old_nodes = [node, node2, node3]
         expected_result = [
-            TextNode("This is text with an ", "text"),
-            TextNode("image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
-            TextNode(" and ", "text"),
-            TextNode("another", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png"),
-            TextNode(" node!", "text"),
-            TextNode("Also text without links!", "text")
+            TextNode("This is text with an ", text_type_text),
+            TextNode(text_type_image, text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and ", text_type_text),
+            TextNode("another", text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png"),
+            TextNode(" node!", text_type_text),
+            TextNode("Also text without links!", text_type_text)
         ]
         self.assertEqual(split_nodes_image(old_nodes), expected_result)
 
     def test_node_with_link(self):
         text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and [a link](link.link)"
-        node = TextNode(text, "text")
+        node = TextNode(text, text_type_text)
         old_nodes = [node]
         expected_result = [
-            TextNode("This is text with an ", "text"),
-            TextNode("image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
-            TextNode(" and [a link](link.link)", "text")
+            TextNode("This is text with an ", text_type_text),
+            TextNode(text_type_image, text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and [a link](link.link)", text_type_text)
         ]
         self.assertEqual(split_nodes_image(old_nodes), expected_result)
 
@@ -171,42 +179,42 @@ class TestSplitNodesLink(unittest.TestCase):
     #I was lazy with these cases since they're basically the same as image
     def test_one_node_ending_with_link(self):
         text = "This is text with an [image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and [another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
-        node = TextNode(text, "text")
+        node = TextNode(text, text_type_text)
         old_nodes = [node]
         expected_result = [
-            TextNode("This is text with an ", "text"),
-            TextNode("image", "link", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
-            TextNode(" and ", "text"),
-            TextNode("another", "link", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png")
+            TextNode("This is text with an ", text_type_text),
+            TextNode(text_type_image, text_type_link, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and ", text_type_text),
+            TextNode("another", text_type_link, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png")
         ]
         self.assertEqual(split_nodes_link(old_nodes), expected_result)
 
     def test_multiple_nodes(self):
         text = "This is text with an [image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png)"       
-        node = TextNode(text, "text")
+        node = TextNode(text, text_type_text)
         text = " and [another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png) node!"
-        node2 = TextNode(text, "text")
+        node2 = TextNode(text, text_type_text)
         text = "Also text without links!"
-        node3 = TextNode(text, "text")
+        node3 = TextNode(text, text_type_text)
         old_nodes = [node, node2, node3]
         expected_result = [
-            TextNode("This is text with an ", "text"),
-            TextNode("image", "link", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
-            TextNode(" and ", "text"),
-            TextNode("another", "link", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png"),
-            TextNode(" node!", "text"),
-            TextNode("Also text without links!", "text")
+            TextNode("This is text with an ", text_type_text),
+            TextNode(text_type_image, text_type_link, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and ", text_type_text),
+            TextNode("another", text_type_link, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png"),
+            TextNode(" node!", text_type_text),
+            TextNode("Also text without links!", text_type_text)
         ]
         self.assertEqual(split_nodes_link(old_nodes), expected_result)
 
     def test_node_with_link(self):
         text = "This is text with an [image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![a link](link.link)"
-        node = TextNode(text, "text")
+        node = TextNode(text, text_type_text)
         old_nodes = [node]
         expected_result = [
-            TextNode("This is text with an ", "text"),
-            TextNode("image", "link", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
-            TextNode(" and ![a link](link.link)", "text")
+            TextNode("This is text with an ", text_type_text),
+            TextNode(text_type_image, text_type_link, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and ![a link](link.link)", text_type_text)
         ]
         self.assertEqual(split_nodes_link(old_nodes), expected_result)
 
@@ -217,16 +225,16 @@ class TestTextToTextNodes(unittest.TestCase):
     def test_text_with_all_types(self):
         text = "This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
         expected_result = [
-            TextNode("This is ", "text"),
-            TextNode("text", "bold"),
-            TextNode(" with an ", "text"),
-            TextNode("italic", "italic"),
-            TextNode(" word and a ", "text"),
-            TextNode("code block", "code"),
-            TextNode(" and an ", "text"),
-            TextNode("image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
-            TextNode(" and a ", "text"),
-            TextNode("link", "link", "https://boot.dev"),
+            TextNode("This is ", text_type_text),
+            TextNode(text_type_text, text_type_bold),
+            TextNode(" with an ", text_type_text),
+            TextNode(text_type_italic, text_type_italic),
+            TextNode(" word and a ", text_type_text),
+            TextNode("code block", text_type_code),
+            TextNode(" and an ", text_type_text),
+            TextNode(text_type_image, text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and a ", text_type_text),
+            TextNode(text_type_link, text_type_link, "https://boot.dev"),
         ]
 
         self.assertEqual(text_to_textnodes(text), expected_result)
@@ -234,14 +242,14 @@ class TestTextToTextNodes(unittest.TestCase):
     def test_text_with_all_but_one_types(self):
         text = "This is text with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
         expected_result = [
-            TextNode("This is text with an ", "text"),
-            TextNode("italic", "italic"),
-            TextNode(" word and a ", "text"),
-            TextNode("code block", "code"),
-            TextNode(" and an ", "text"),
-            TextNode("image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
-            TextNode(" and a ", "text"),
-            TextNode("link", "link", "https://boot.dev"),
+            TextNode("This is text with an ", text_type_text),
+            TextNode(text_type_italic, text_type_italic),
+            TextNode(" word and a ", text_type_text),
+            TextNode("code block", text_type_code),
+            TextNode(" and an ", text_type_text),
+            TextNode(text_type_image, text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and a ", text_type_text),
+            TextNode(text_type_link, text_type_link, "https://boot.dev"),
         ]
 
         self.assertEqual(text_to_textnodes(text), expected_result)
@@ -249,7 +257,7 @@ class TestTextToTextNodes(unittest.TestCase):
     def test_just_text(self):
         text = "This is text"
         expected_result = [
-            TextNode("This is text", "text")
+            TextNode("This is text", text_type_text)
         ]
 
         self.assertEqual(text_to_textnodes(text), expected_result)
@@ -415,7 +423,7 @@ class TestConvertParagraphBlockToHTML(unittest.TestCase):
         text = "I am text with a **bold** word."
         expected_result = ParentNode("p", children=[
             LeafNode(None, "I am text with a "),
-            LeafNode("b", "bold"),
+            LeafNode("b", text_type_bold),
             LeafNode(None, " word.")
         ])
         self.assertEqual(convert_paragraph_block_to_html(text), expected_result)
@@ -424,7 +432,7 @@ class TestConvertParagraphBlockToHTML(unittest.TestCase):
         text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png)."
         expected_result = ParentNode("p", children=[
             LeafNode(None, "This is text with an "),
-            LeafNode("img", "", props={"src": "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png", "alt": "image"}),
+            LeafNode("img", "", props={"src": "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png", "alt": text_type_image}),
             LeafNode(None, ".")
         ])
         self.assertEqual(convert_paragraph_block_to_html(text), expected_result)
