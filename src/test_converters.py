@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode
-from htmlnode import LeafNode
+from htmlnode import LeafNode, HTMLNode, ParentNode
 from converters import (
     text_node_to_html_node
     ,split_nodes_delimiter
@@ -10,6 +10,7 @@ from converters import (
     ,text_to_textnodes
     ,markdown_to_blocks
     ,block_to_block_type
+    ,convert_paragraph_block_to_html
     ,block_type_paragraph
     ,block_type_heading
     ,block_type_code
@@ -405,6 +406,28 @@ class TestBlockToBlockType(unittest.TestCase):
         text = "\n".join([line1, line2])
         expected_result = block_type_paragraph
         self.assertEqual(block_to_block_type(text), expected_result)
+
+    if __name__ == "__main__":
+        unittest.main()
+
+class TestConvertParagraphBlockToHTML(unittest.TestCase):
+    def test_text_with_bold(self):
+        text = "I am text with a **bold** word."
+        expected_result = ParentNode("p", children=[
+            LeafNode(None, "I am text with a "),
+            LeafNode("b", "bold"),
+            LeafNode(None, " word.")
+        ])
+        self.assertEqual(convert_paragraph_block_to_html(text), expected_result)
+    
+    def test_text_with_image(self):
+        text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png)."
+        expected_result = ParentNode("p", children=[
+            LeafNode(None, "This is text with an "),
+            LeafNode("img", "", props={"src": "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png", "alt": "image"}),
+            LeafNode(None, ".")
+        ])
+        self.assertEqual(convert_paragraph_block_to_html(text), expected_result)
 
     if __name__ == "__main__":
         unittest.main()

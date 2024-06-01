@@ -1,4 +1,4 @@
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 from textnode import TextNode
 from extractors import extract_markdown_images
 from extractors import extract_markdown_links
@@ -140,3 +140,8 @@ def block_to_block_type(markdown_block):
         return block_type_ordered_list
 
     return block_type_paragraph
+
+def convert_paragraph_block_to_html(markdown_block):
+    text_nodes = text_to_textnodes(markdown_block)
+    html_nodes = list(map(lambda node: text_node_to_html_node(node), text_nodes))
+    return ParentNode("p", children=html_nodes)
