@@ -20,6 +20,7 @@ from converters import (
     ,block_to_block_type
     ,convert_paragraph_block_to_html
     ,convert_code_block_to_html
+    ,convert_heading_block_to_html
     ,block_type_paragraph
     ,block_type_heading
     ,block_type_code
@@ -457,6 +458,20 @@ I have a second line.
             LeafNode("code", "I am some nice code.\nI have a second line.")
         ])
         self.assertEqual(convert_code_block_to_html(text), expected_result)
+ 
+    if __name__ == "__main__":
+        unittest.main()
+
+class TestConvertHeadingBlockToHTML(unittest.TestCase):
+    def test_h2_heading(self):
+        text = "## I am a heading"
+        expected_result = HTMLNode("h2", "I am a heading") 
+        self.assertEqual(convert_heading_block_to_html(text), expected_result)
+    
+    def test_h2_heading_with_whitespace(self):
+        text = "##   I am a heading with extra whitespace  "
+        expected_result = HTMLNode("h2", "I am a heading with extra whitespace") 
+        self.assertEqual(convert_heading_block_to_html(text), expected_result)
  
     if __name__ == "__main__":
         unittest.main()

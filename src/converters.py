@@ -160,3 +160,7 @@ def convert_code_block_to_html(markdown_block):
     #Remove second strip() and alter test cases if this should not be done.
     code_node = text_node_to_html_node(TextNode(markdown_block.strip('`').strip(), text_type_code))
     return ParentNode("pre", children=[code_node])
+
+def convert_heading_block_to_html(markdown_block):
+    heading_num, text = markdown_block.split(' ', maxsplit=1)
+    return HTMLNode(f"h{len(heading_num)}", text.strip())
