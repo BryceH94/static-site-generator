@@ -13,7 +13,15 @@ class HTMLNode:
     
     def __repr__(self):
         return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
-    
+
+    def __eq__(self, OtherHTMLNode):
+        if (self.tag == OtherHTMLNode.tag and self.value == OtherHTMLNode.value
+            and self.value == OtherHTMLNode.value and self.props == OtherHTMLNode.props):
+            return True
+        return False
+
+
+
 class LeafNode(HTMLNode):
     def __init__(self, tag=None, value=None, children=None, props=None):
         if value is None:
