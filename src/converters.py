@@ -154,6 +154,9 @@ def convert_paragraph_block_to_html(markdown_block):
     html_nodes = list(map(lambda node: text_node_to_html_node(node), text_nodes))
     return ParentNode("p", children=html_nodes)
 
-#TODO Add in textnode types? So I don't forget what tags to use for textNode and HTMLNode
 def convert_code_block_to_html(markdown_block):
-    pass
+    #Currently strips whitespace after stripping triple backticks. 
+    #Don't know how code/pre tags work in html well enough to know if should do this or not.
+    #Remove second strip() and alter test cases if this should not be done.
+    code_node = text_node_to_html_node(TextNode(markdown_block.strip('`').strip(), text_type_code))
+    return ParentNode("pre", children=[code_node])

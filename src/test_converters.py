@@ -19,6 +19,7 @@ from converters import (
     ,markdown_to_blocks
     ,block_to_block_type
     ,convert_paragraph_block_to_html
+    ,convert_code_block_to_html
     ,block_type_paragraph
     ,block_type_heading
     ,block_type_code
@@ -437,6 +438,26 @@ class TestConvertParagraphBlockToHTML(unittest.TestCase):
         ])
         self.assertEqual(convert_paragraph_block_to_html(text), expected_result)
 
+    if __name__ == "__main__":
+        unittest.main()
+
+class TestConvertCodeBlockToHTML(unittest.TestCase):
+    def test_one_line_of_code(self):
+        text = "```I am some nice code.```"
+        expected_result = ParentNode("pre", children=[
+            LeafNode("code", "I am some nice code.")
+        ])
+        self.assertEqual(convert_code_block_to_html(text), expected_result)
+
+    def test_multiple_lines_of_code(self):
+        text = """```I am some nice code.
+I have a second line.        
+```"""
+        expected_result = ParentNode("pre", children=[
+            LeafNode("code", "I am some nice code.\nI have a second line.")
+        ])
+        self.assertEqual(convert_code_block_to_html(text), expected_result)
+ 
     if __name__ == "__main__":
         unittest.main()
 
