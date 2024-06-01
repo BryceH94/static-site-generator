@@ -21,6 +21,7 @@ from converters import (
     ,convert_paragraph_block_to_html
     ,convert_code_block_to_html
     ,convert_heading_block_to_html
+    ,convert_quote_block_to_html
     ,block_type_paragraph
     ,block_type_heading
     ,block_type_code
@@ -465,13 +466,28 @@ I have a second line.
 class TestConvertHeadingBlockToHTML(unittest.TestCase):
     def test_h2_heading(self):
         text = "## I am a heading"
-        expected_result = HTMLNode("h2", "I am a heading") 
+        expected_result = LeafNode("h2", "I am a heading") 
         self.assertEqual(convert_heading_block_to_html(text), expected_result)
     
     def test_h2_heading_with_whitespace(self):
         text = "##   I am a heading with extra whitespace  "
-        expected_result = HTMLNode("h2", "I am a heading with extra whitespace") 
+        expected_result = LeafNode("h2", "I am a heading with extra whitespace") 
         self.assertEqual(convert_heading_block_to_html(text), expected_result)
+ 
+    if __name__ == "__main__":
+        unittest.main()
+
+class TestConvertQuoteBlockToHTML(unittest.TestCase):
+    def test_single_line_quote(self):
+        text = "> I am a small quote"
+        expected_result = LeafNode("blockquote", "I am a small quote") 
+        self.assertEqual(convert_quote_block_to_html(text), expected_result)
+    
+    def test_multi_line_quote(self):
+        text = """> I am a small quote
+> But I have a second line"""
+        expected_result = LeafNode("blockquote", "I am a small quote\nBut I have a second line")
+        self.assertEqual(convert_quote_block_to_html(text), expected_result)
  
     if __name__ == "__main__":
         unittest.main()

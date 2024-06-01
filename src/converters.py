@@ -163,4 +163,8 @@ def convert_code_block_to_html(markdown_block):
 
 def convert_heading_block_to_html(markdown_block):
     heading_num, text = markdown_block.split(' ', maxsplit=1)
-    return HTMLNode(f"h{len(heading_num)}", text.strip())
+    return LeafNode(f"h{len(heading_num)}", text.strip())
+
+def convert_quote_block_to_html(markdown_block):
+    text = "\n".join(map(lambda line: line.lstrip(">").strip(), markdown_block.split("\n")))
+    return LeafNode("blockquote", text) 
