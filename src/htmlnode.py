@@ -20,8 +20,6 @@ class HTMLNode:
             return True
         return False
 
-
-
 class LeafNode(HTMLNode):
     def __init__(self, tag=None, value=None, children=None, props=None):
         if value is None:
@@ -56,6 +54,12 @@ class ParentNode(HTMLNode):
         if children is None:
             raise ValueError("children are required for a ParentNode")
         super().__init__(tag=tag, children=children, props=props)
+
+    def __eq__(self, OtherHTMLNode):
+        if (self.tag == OtherHTMLNode.tag and self.value == OtherHTMLNode.value
+            and self.value == OtherHTMLNode.value and self.props == OtherHTMLNode.props):
+            return True
+        return False
 
     def to_html(self):
         current_text = f'<{self.tag}>' if self.props is None else f'<{self.tag} {self.props_to_html()}>'
