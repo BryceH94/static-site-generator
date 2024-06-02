@@ -190,4 +190,24 @@ def convert_olist_block_to_html(markdown_block):
     return ParentNode("ol", children=list_nodes)
 
 def markdown_to_html_node(markdown):
-    pass
+    # Converts full markdown document to html node.
+    # Top level HTML node should be a div and each child is a block of the document
+    # Each block should have its own inline children, where applicable
+    markdown_blocks = markdown_to_blocks(markdown)
+    block_nodes = []
+    for markdown_block in markdown_blocks:
+        block_type = block_to_block_type(markdown_block)
+        if block_type == block_type_paragraph:
+            block_nodes.append(convert_paragraph_block_to_html(markdown_block))
+        if block_type == block_type_code:
+            block_nodes.append(convert_code_block_to_html(markdown_block))
+        if block_type == block_type_quote:
+            block_nodes.append(convert_quote_block_to_html(markdown_block))
+        if block_type == block_type_unordered_list:
+            block_nodes.append(convert_ulist_block_to_html(markdown_block))
+        if block_type == block_type_ordered_list:
+            block_nodes.append(convert_olist_block_to_html(markdown_block))
+        if block_type == block_type_heading:
+            block_nodes.append(convert_heading_block_to_html(markdown_block))
+
+    return ParentNode("div", children=block_nodes)

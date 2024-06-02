@@ -24,6 +24,7 @@ from converters import (
     ,convert_quote_block_to_html
     ,convert_ulist_block_to_html
     ,convert_olist_block_to_html
+    ,markdown_to_html_node
     ,block_type_paragraph
     ,block_type_heading
     ,block_type_code
@@ -565,6 +566,59 @@ class TestConvertOlistBlockToHTML(unittest.TestCase):
         ])
         self.assertEqual(convert_olist_block_to_html(text), expected_result)
  
+    if __name__ == "__main__":
+        unittest.main()
+
+class TestMarkdownToHTMLNode(unittest.TestCase):
+    def test_basic_doc(self):
+        text = """## I am heading
+        
+I am a paragraph
+
+* I am a cool list
+* With lots of insight
+
+```
+I wrote some code!
+```
+
+1. I am a recipe
+2. Add butter and salt
+
+> I am an insightful quote"""
+        expected_result = ParentNode("div", children=[
+            ParentNode("h2", children=[
+                LeafNode(None, "I am heading")
+            ]),
+            ParentNode("p", children=[
+                LeafNode(None, "I am a paragraph")
+            ]),
+            ParentNode("ul", children=[
+                ParentNode("li", children=[
+                    LeafNode(None, "I am a cool list")
+                ]),
+                ParentNode("li", children=[
+                    LeafNode(None, "With lots of insight")
+                ])
+
+            ]),
+            ParentNode("code", children=[
+                LeafNode(None, "I wrote some code!")
+            ]),
+            ParentNode("ol", children=[
+                ParentNode("li", children=[
+                    LeafNode(None, "I am a recipe")
+                ]),
+                ParentNode("li", children=[
+                    LeafNode(None, "Add butter and salt")
+                ])
+            ]),
+            ParentNode("blockquote", children=[
+                LeafNode(None, "I am an insightful quote")
+            ])
+        ])
+        self.assertEqual(markdown_to_html_node(text), expected_result)
+    
     if __name__ == "__main__":
         unittest.main()
 
