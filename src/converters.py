@@ -181,7 +181,13 @@ def convert_ulist_block_to_html(markdown_block):
     return ParentNode("ul", children=list_nodes)
 
 def convert_olist_block_to_html(markdown_block):
-    pass
+    items = list((map(lambda line: line.lstrip("1234567890.").strip(), markdown_block.split("\n"))))
+    item_nodes = [text_to_textnodes(item) for item in items] 
+    list_items = []
+    for item_node in item_nodes:
+        list_items.append(list(map(lambda node: text_node_to_html_node(node), item_node)))
+    list_nodes = [ParentNode("li", children=item_list) for item_list in list_items]
+    return ParentNode("ol", children=list_nodes)
 
 def markdown_to_html_node(markdown):
     pass

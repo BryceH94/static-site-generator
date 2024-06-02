@@ -23,6 +23,7 @@ from converters import (
     ,convert_heading_block_to_html
     ,convert_quote_block_to_html
     ,convert_ulist_block_to_html
+    ,convert_olist_block_to_html
     ,block_type_paragraph
     ,block_type_heading
     ,block_type_code
@@ -522,10 +523,47 @@ class TestConvertUlistBlockToHTML(unittest.TestCase):
             ]),
             ParentNode("li", children=[
                 LeafNode(None, "I am a list item with a "),
-                LeafNode("img", "", props={"src": "coolrul.com", "alt": "cool image"})
+                LeafNode("img", "", props={"src": "coolurl.com", "alt": "cool image"})
             ])
         ])
         self.assertEqual(convert_ulist_block_to_html(text), expected_result)
+ 
+    if __name__ == "__main__":
+        unittest.main()
+
+class TestConvertOlistBlockToHTML(unittest.TestCase):
+    def test_single_line_list(self):
+        text = "1. I am a brief list with **bolded** text"
+        expected_result = ParentNode("ol", children=[
+            ParentNode("li", children=[
+                LeafNode(None, "I am a brief list with "),
+                LeafNode(text_type_bold, "bolded"),
+                LeafNode(None, " text")
+            ])
+        ])
+        self.assertEqual(convert_olist_block_to_html(text), expected_result)
+    
+    def test_multi_line_list(self):
+        text = """1. I am a list with **bolded** text
+2. I am a list item with *italic* text
+3. I am a list item with a ![cool image](coolurl.com)"""
+        expected_result = ParentNode("ol", children=[
+            ParentNode("li", children=[
+                LeafNode(None, "I am a list with "),
+                LeafNode(text_type_bold, "bolded"),
+                LeafNode(None, " text")
+            ]),
+            ParentNode("li", children=[
+                LeafNode(None, "I am a list item with "),
+                LeafNode(text_type_italic, "italic"),
+                LeafNode(None, " text")
+            ]),
+            ParentNode("li", children=[
+                LeafNode(None, "I am a list item with a "),
+                LeafNode("img", "", props={"src": "coolurl.com", "alt": "cool image"})
+            ])
+        ])
+        self.assertEqual(convert_olist_block_to_html(text), expected_result)
  
     if __name__ == "__main__":
         unittest.main()
