@@ -168,3 +168,20 @@ def convert_heading_block_to_html(markdown_block):
 def convert_quote_block_to_html(markdown_block):
     text = "\n".join(map(lambda line: line.lstrip(">").strip(), markdown_block.split("\n")))
     return LeafNode("blockquote", text) 
+
+def convert_ulist_block_to_html(markdown_block):
+    items = list((map(lambda line: line.lstrip("*-").strip(), markdown_block.split("\n"))))
+    item_nodes = [text_to_textnodes(item) for item in items] 
+    list_items = []
+    for item_node in item_nodes:
+        list_items.append(list(map(lambda node: text_node_to_html_node(node), item_node)))
+    # Now I should have a list of my items where each item is a list of LeafNodes with the text and styling
+    # Parent node with ul, each line is ParentNode of li with children of LeafNodes with text
+    list_nodes = [ParentNode("li", children=item_list) for item_list in list_items]
+    return ParentNode("ul", children=list_nodes)
+
+def convert_olist_block_to_html(markdown_block):
+    pass
+
+def markdown_to_html_node(markdown):
+    pass

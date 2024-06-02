@@ -22,6 +22,7 @@ from converters import (
     ,convert_code_block_to_html
     ,convert_heading_block_to_html
     ,convert_quote_block_to_html
+    ,convert_ulist_block_to_html
     ,block_type_paragraph
     ,block_type_heading
     ,block_type_code
@@ -488,6 +489,43 @@ class TestConvertQuoteBlockToHTML(unittest.TestCase):
 > But I have a second line"""
         expected_result = LeafNode("blockquote", "I am a small quote\nBut I have a second line")
         self.assertEqual(convert_quote_block_to_html(text), expected_result)
+ 
+    if __name__ == "__main__":
+        unittest.main()
+
+class TestConvertUlistBlockToHTML(unittest.TestCase):
+    def test_single_line_list(self):
+        text = "* I am a brief list with **bolded** text"
+        expected_result = ParentNode("ul", children=[
+            ParentNode("li", children=[
+                LeafNode(None, "I am a brief list with "),
+                LeafNode(text_type_bold, "bolded"),
+                LeafNode(None, " text")
+            ])
+        ])
+        self.assertEqual(convert_ulist_block_to_html(text), expected_result)
+    
+    def test_multi_line_list(self):
+        text = """* I am a list with **bolded** text
+- I am a list item with *italic* text
+* I am a list item with a ![cool image](coolurl.com)"""
+        expected_result = ParentNode("ul", children=[
+            ParentNode("li", children=[
+                LeafNode(None, "I am a list with "),
+                LeafNode(text_type_bold, "bolded"),
+                LeafNode(None, " text")
+            ]),
+            ParentNode("li", children=[
+                LeafNode(None, "I am a list item with "),
+                LeafNode(text_type_italic, "italic"),
+                LeafNode(None, " text")
+            ]),
+            ParentNode("li", children=[
+                LeafNode(None, "I am a list item with a "),
+                LeafNode("img", "", props={"src": "coolrul.com", "alt": "cool image"})
+            ])
+        ])
+        self.assertEqual(convert_ulist_block_to_html(text), expected_result)
  
     if __name__ == "__main__":
         unittest.main()
