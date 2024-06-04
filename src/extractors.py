@@ -5,3 +5,13 @@ def extract_markdown_images(text):
     
 def extract_markdown_links(text):
     return re.findall(r"\s\[(.*?)\]\((.*?)\)",text)
+
+def extract_title(markdown):
+    title = markdown.split("\n", maxsplit=1)[0]
+    if title:
+        if title.startswith("# "):
+            return title[2:].strip()
+        else:
+            raise Exception("No title provided")
+    else:
+        raise Exception("No text provided")
