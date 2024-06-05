@@ -1,15 +1,18 @@
 from converters import markdown_to_html_node
 from htmlnode import HTMLNode
 from extractors import extract_title
+from os import path, makedirs
 
 def generate_page(from_path, template_path, dest_path):
-    
-    #Print a message to the console that says something like "Generating page from from_path to dest_path using template_path".
-    #Read the markdown file at from_path and store the contents in a variable.
-    #Read the template file at template_path and store the contents in a variable.
-    #Use your markdown_to_html_node function and .to_html() method to convert the markdown file to HTML.
-    #Use the extract_title function to grab the title of the page.
-    #Replace the {{ Title }} and {{ Content }} placeholders in the template with the HTML and title you generated.
-    #Write the new HTML to a file at dest_path. Be sure to create any necessary directories if they don't exist.
-
-    pass
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    with open(from_path, "r") as f:
+        from_content = f.read()
+    with open(template_path, "r") as f:
+        dest_html = f.read()
+    from_html = markdown_to_html_node(from_content).to_html()
+    from_title = extract_title(from_content)
+    dest_html = dest_html.replace(r"{{ Title }}", from_title)
+    dest_html = dest_html.replace(r"{{ Content }}", from_html)
+    makedirs(path.dirname(dest_path), exist_ok=True)
+    with open(dest_path, "w") as f:
+        f.write(dest_html)
