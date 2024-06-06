@@ -208,6 +208,8 @@ def markdown_to_html_node(markdown):
         if block_type == block_type_ordered_list:
             block_nodes.append(convert_olist_block_to_html(markdown_block))
         if block_type == block_type_heading:
+            #TODO Can heading have bold formatting? Not sure if valid
+            # Currently leaves it
             block_nodes.append(convert_heading_block_to_html(markdown_block))
 
     return ParentNode("div", children=block_nodes)
