@@ -4,7 +4,7 @@ def extract_markdown_images(text):
     return re.findall(r"!\[(.*?)\]\((.*?)\)",text)
     
 def extract_markdown_links(text):
-    return re.findall(r"\s\[(.*?)\]\((.*?)\)",text)
+    return [(match[1], match[2]) for match in re.findall(r"(^|\s)\[(.*?)\]\((.*?)\)",text)]
 
 def extract_title(markdown):
     title = markdown.split("\n", maxsplit=1)[0]
